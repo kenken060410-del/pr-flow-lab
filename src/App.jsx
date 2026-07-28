@@ -12,10 +12,21 @@ export default function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [completed, setCompleted] = useState(false);
   const simulatorRef = useRef(null);
+  const currentStepRef = useRef(null);
+  const completionRef = useRef(null);
   const step = FLOW_STEPS[currentStep];
 
   function scrollToSimulator() {
     simulatorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function scrollToContent(targetRef) {
+    window.requestAnimationFrame(() => {
+      const behavior = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth";
+      targetRef.current?.scrollIntoView({ behavior, block: "start" });
+    });
   }
 
   function handleStart() {
@@ -33,14 +44,17 @@ export default function App() {
   function handleSelectStep(index) {
     setCurrentStep(index);
     setCompleted(false);
+    scrollToContent(currentStepRef);
   }
 
   function handlePrevious() {
     if (completed) {
       setCompleted(false);
+      scrollToContent(currentStepRef);
       return;
     }
     setCurrentStep((value) => previousStep(value));
+    scrollToContent(currentStepRef);
   }
 
   function handleNext() {
@@ -50,9 +64,11 @@ export default function App() {
     }
     if (currentStep === FLOW_STEPS.length - 1) {
       setCompleted(true);
+      scrollToContent(completionRef);
       return;
     }
     setCurrentStep((value) => nextStep(value));
+    scrollToContent(currentStepRef);
   }
 
   const primaryLabel = completed
@@ -74,7 +90,7 @@ export default function App() {
         >
           <StepRail currentStep={currentStep} onSelect={handleSelectStep} />
 
-          <div className="current-step">
+          <div className="current-step" ref={currentStepRef} aria-live="polite">
             <p className="step-counter">
               STEP {currentStep + 1} / {FLOW_STEPS.length}
             </p>
@@ -95,7 +111,7 @@ export default function App() {
           <BranchDiagram step={currentStep} completed={completed} />
 
           {completed ? (
-            <section className="completion-notice" aria-live="polite">
+            <section className="completion-notice" ref={completionRef} aria-live="polite">
               <span className="completion-icon">
                 <CheckIcon />
               </span>
