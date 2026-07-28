@@ -293,6 +293,7 @@ a:focus-visible {
 
 .current-step {
   margin-top: 20px;
+  scroll-margin-top: 18px;
 }
 
 .step-counter {
@@ -479,6 +480,7 @@ a:focus-visible {
   padding: 16px 18px;
   border: 1px solid #55b96d;
   display: flex;
+  scroll-margin-top: 18px;
   align-items: center;
   gap: 15px;
   background: var(--green-soft);
